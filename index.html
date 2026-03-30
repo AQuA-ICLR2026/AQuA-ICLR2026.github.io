@@ -2,108 +2,475 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <!-- Meta tags for social media banners, these should be filled in appropriatly as they are your "business card" -->
-  <!-- Replace the content tag with appropriate information -->
   <meta name="description" content="AQuA: Toward Strategic Response Generation for Ambiguous Visual Questions">
   <meta property="og:title" content="AQuA: Toward Strategic Response Generation for Ambiguous Visual Questions"/>
   <meta property="og:description" content="AQuA: Toward Strategic Response Generation for Ambiguous Visual Questions"/>
-
   <meta name="twitter:title" content="AQuA: Toward Strategic Response Generation for Ambiguous Visual Questions">
   <meta name="twitter:description" content="AQuA: Toward Strategic Response Generation for Ambiguous Visual Questions">
-  <!-- Keywords for your paper to be indexed by-->
-  <meta name="keywords" content="Visual Question Answering, Vision–Language Models">
+  <meta name="keywords" content="Visual Question Answering, Vision–Language Models, Ambiguity, VLM">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-
   <title>AQuA</title>
-  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
-  rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
   <link rel="stylesheet" href="static/css/bulma.min.css">
   <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
   <link rel="stylesheet" href="static/css/bulma-slider.min.css">
   <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
-  <link rel="stylesheet"
-  href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
   <link rel="stylesheet" href="static/css/index.css">
-
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
   <script defer src="static/js/fontawesome.all.min.js"></script>
   <script src="static/js/bulma-carousel.min.js"></script>
   <script src="static/js/bulma-slider.min.js"></script>
   <script src="static/js/index.js"></script>
+
+  <style>
+    :root {
+      --aqua-blue: #1a73e8;
+      --aqua-dark: #0d1117;
+      --aqua-accent: #e84040;
+      --aqua-light-bg: #f8f9fc;
+      --level0: #4a90d9;
+      --level1: #5bb85b;
+      --level2: #f5a623;
+      --level3: #e84040;
+    }
+
+    body {
+      font-family: 'Noto Sans', sans-serif;
+      color: #1a1a2e;
+    }
+
+    .publication-title {
+      font-family: 'Castoro', serif;
+      font-size: 2.4rem !important;
+      line-height: 1.2 !important;
+      color: #0d1117;
+    }
+
+    .section-title {
+      font-family: 'Google Sans', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #0d1117;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── Hero ── */
+    .hero.is-dark-hero {
+      background: linear-gradient(135deg, #0d1117 0%, #1a2540 60%, #0d2137 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero.is-dark-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 20% 50%, rgba(26,115,232,0.15) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 20%, rgba(232,64,64,0.10) 0%, transparent 50%);
+    }
+    .hero.is-dark-hero .publication-title { color: #ffffff; }
+    .hero.is-dark-hero .author-block a { color: #7eb8f7; }
+    .hero.is-dark-hero .is-size-5 { color: #cdd6f4; }
+
+    .section-title span {
+      color: var(--aqua-blue);
+    }
+
+    /* ── Motivation card ── */
+    .motivation-box {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.08);
+      padding: 2.5rem;
+      border-left: 5px solid var(--aqua-blue);
+    }
+    .motivation-quote {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.3rem;
+      color: #333;
+      font-style: italic;
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+
+    /* ── Response comparison ── */
+    .response-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+      margin-top: 1.5rem;
+    }
+    .response-card {
+      border-radius: 12px;
+      padding: 1.2rem 1.5rem;
+      font-size: 0.93rem;
+      line-height: 1.6;
+    }
+    .response-card.bad {
+      background: #fff5f5;
+      border: 1.5px solid #fca5a5;
+    }
+    .response-card.good {
+      background: #f0fdf4;
+      border: 1.5px solid #86efac;
+    }
+    .response-label {
+      font-weight: 700;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+    }
+    .response-label.bad { color: var(--aqua-accent); }
+    .response-label.good { color: #16a34a; }
+
+    /* ── Level cards ── */
+    .level-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.2rem;
+      margin-top: 1.5rem;
+    }
+    .level-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+      border-top: 4px solid;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .level-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.10);
+    }
+    .level-card.l0 { border-color: var(--level0); }
+    .level-card.l1 { border-color: var(--level1); }
+    .level-card.l2 { border-color: var(--level2); }
+    .level-card.l3 { border-color: var(--level3); }
+    .level-badge {
+      display: inline-block;
+      border-radius: 20px;
+      padding: 0.15rem 0.75rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.6rem;
+    }
+    .level-card.l0 .level-badge { background: var(--level0); }
+    .level-card.l1 .level-badge { background: var(--level1); }
+    .level-card.l2 .level-badge { background: var(--level2); }
+    .level-card.l3 .level-badge { background: var(--level3); }
+    .level-title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.4rem;
+      color: #111;
+    }
+    .level-strategy {
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.5rem;
+      opacity: 0.7;
+    }
+    .level-card img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin: 0.8rem 0;
+      display: block;
+    }
+    .level-example {
+      font-size: 0.88rem;
+      color: #555;
+      background: #f8f9fc;
+      border-radius: 8px;
+      padding: 0.6rem 0.8rem;
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+    .image-placeholder {
+      background: #e8edf5;
+      border-radius: 8px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #888;
+      font-size: 0.82rem;
+      margin-bottom: 0.8rem;
+      border: 2px dashed #c8d0df;
+    }
+
+    /* ── Stats ── */
+    .stats-row {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .stat-card {
+      flex: 1;
+      min-width: 120px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.2rem;
+      text-align: center;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .stat-number {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2rem;
+      color: var(--aqua-blue);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.82rem;
+      color: #666;
+      margin-top: 0.3rem;
+    }
+
+    /* ── Training pipeline ── */
+    .pipeline {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 1.5rem 0;
+      flex-wrap: wrap;
+    }
+    .pipeline-step {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1rem 1.4rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      text-align: center;
+      flex: 1;
+      min-width: 130px;
+    }
+    .pipeline-step .step-icon {
+      font-size: 1.8rem;
+      margin-bottom: 0.4rem;
+    }
+    .pipeline-step .step-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #111;
+    }
+    .pipeline-step .step-desc {
+      font-size: 0.78rem;
+      color: #666;
+      margin-top: 0.2rem;
+    }
+    .pipeline-arrow {
+      font-size: 1.5rem;
+      color: #aaa;
+    }
+
+    /* ── Results table ── */
+    .results-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+      font-size: 0.88rem;
+      margin-top: 1.5rem;
+      border: 1px solid #e2e8f0;
+    }
+    .results-table thead tr {
+      background: #ffffff;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    .results-table thead th {
+      padding: 0.85rem 1rem;
+      font-weight: 600;
+      font-size: 0.82rem;
+      text-align: center;
+      color: #6b7280;
+      letter-spacing: 0.03em;
+    }
+    .results-table thead th:first-child { text-align: left; }
+    .results-table tbody tr { background: #fff; }
+    .results-table tbody tr:nth-child(even) { background: #fafafa; }
+    .results-table tbody td {
+      padding: 0.75rem 1rem;
+      text-align: center;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .results-table tbody td:first-child { text-align: left; font-weight: 500; }
+
+    /* section group rows */
+    .results-table tbody tr.group-zeroshot td {
+      background: #f8faff;
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #4a5568;
+      padding: 0.5rem 1rem;
+      border-left: 4px solid #94a3b8;
+    }
+    .results-table tbody tr.group-prompting td {
+      background: #fff8f0;
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #92400e;
+      padding: 0.5rem 1rem;
+      border-left: 4px solid var(--level2);
+    }
+    .results-table tbody tr.group-tuned td {
+      background: #eef6ff;
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #1d4ed8;
+      padding: 0.5rem 1rem;
+      border-left: 4px solid var(--aqua-blue);
+    }
+
+    /* data rows — left border by group */
+    .results-table tbody tr.row-zeroshot td:first-child { border-left: 4px solid #e2e8f0; }
+    .results-table tbody tr.row-prompting td:first-child { border-left: 4px solid #fed7aa; }
+    .results-table tbody tr.row-tuned td:first-child { border-left: 4px solid #93c5fd; }
+    .results-table tbody tr.row-tuned { background: #f0f7ff; }
+    .results-table tbody tr.row-tuned td { color: #1a73e8; font-weight: 600; }
+
+    .best { color: #16a34a !important; font-weight: 800 !important; }
+
+    /* ── Example cards ── */
+    .example-section {
+      background: var(--aqua-light-bg);
+    }
+    .example-card {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+    .example-header {
+      background: #f1f5f9;
+      padding: 0.8rem 1.2rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #555;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .example-body {
+      display: grid;
+      grid-template-columns: 160px 1fr 1fr;
+      gap: 0;
+    }
+    .example-image {
+      background: #e8edf5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #888;
+      font-size: 0.78rem;
+      border-right: 1px solid #e2e8f0;
+      padding: 1rem;
+      text-align: center;
+    }
+    .example-response {
+      padding: 1.1rem 1.2rem;
+    }
+    .example-response:first-of-type {
+      border-right: 1px solid #e2e8f0;
+    }
+    .example-response-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 0.5rem;
+    }
+    .example-response-label.zs { color: #e84040; }
+    .example-response-label.ours { color: #16a34a; }
+    .example-response-text {
+      font-size: 0.88rem;
+      color: #333;
+      line-height: 1.55;
+    }
+
+    /* ── Footer ── */
+    .footer { background: #0d1117; color: #8892b0; }
+    .footer a { color: #7eb8f7; }
+    .footer .title { color: #fff; }
+
+    /* ── Misc ── */
+    .section.has-light-bg { background: var(--aqua-light-bg); }
+    .tag.is-level0 { background: var(--level0); color: #fff; }
+    .tag.is-level1 { background: var(--level1); color: #fff; }
+    .tag.is-level2 { background: var(--level2); color: #fff; }
+    .tag.is-level3 { background: var(--level3); color: #fff; }
+
+    @media (max-width: 768px) {
+      .level-grid { grid-template-columns: 1fr; }
+      .response-grid { grid-template-columns: 1fr; }
+      .example-body { grid-template-columns: 1fr; }
+      .pipeline { flex-direction: column; }
+    }
+  </style>
 </head>
 <body>
 
+<!-- ═══════════════════════════ HERO ═══════════════════════════ -->
+<section class="hero is-dark-hero">
+  <div class="hero-body" style="padding: 4rem 1.5rem;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">
+            AQuA: Toward Strategic Response Generation<br>for Ambiguous Visual Questions
+          </h1>
+          <div class="is-size-5 publication-authors" style="margin-top:1.2rem;">
+            <span class="author-block">
+              <a href="https://wlgud2757.github.io/" target="_blank">Jihyoung Jang</a>,&nbsp;
+            </span>
+            <span class="author-block">
+              <a href="https://hyounghk.github.io/" target="_blank">Hyounghun Kim</a>
+            </span>
+          </div>
+          <div class="is-size-6" style="color:#8892b0; margin:0.4rem 0 1.5rem;">
+            POSTECH &nbsp;·&nbsp; ICLR 2026
+          </div>
 
-  <section class="hero">
-    <div class="hero-body">
-      <div class="container is-max-desktop">
-        <div class="columns is-centered">
-          <div class="column has-text-centered">
-            <h1 class="title is-1 publication-title">AQuA: Toward Strategic Response Generation for Ambiguous Visual Questions</h1>
-             <div class="is-size-5 publication-authors">
-              <!-- Paper authors -->
-                  <span class="author-block">
-                  <a href="https://wlgud2757.github.io/" target="_blank">Jihyoung Jang</a>,</span>
-                  <span class="author-block">
-                  <a href="https://hyounghk.github.io/" target="_blank">Hyounghun Kim</a></span>
-                  </div>
-                  <div class="is-size-5 publication-authors">
-                      <span class="author-block">POSTECH</span>
-                  </div>
-
-                    <span class="link-block">
-                      <a href="https://openreview.net/forum?id=7b1MpD6IF8" target="_blank"
-                      class="external-link button is-normal is-rounded is-dark">
-                      <span class="icon">
-                        <i class="fas fa-link"></i>
-                      </span>
-                      <span>OpenReview</span>
-                    </a>
-
-                    <span class="link-block">
-                      <a href="" target="_blank"
-                      class="external-link button is-normal is-rounded is-dark">
-                      <span class="icon">
-                        <i class="ai ai-arxiv"></i>
-                      </span>
-                      <span>ArXiv</span>
-                    </a>
-                  </span>
-
-                  <span class="link-block">
-                    <a href="" target="_blank"
-                    class="external-link button is-normal is-rounded is-dark">
-                    <span class="icon">
-                      <i class="fab fa-github"></i>
-                    </span>
-                    <span>Code</span>
-                  </a >
-                </span>
-
-                  <span class="link-block">
-                    <a href="https://mega.nz/folder/DZlDhJBZ#dsp8_HLLkpL4c3FD74o5sg" target="_blank"
-                    class="external-link button is-normal is-rounded is-dark">
-                    <span class="icon">
-                      <i class="fas fa-database"></i>
-                    </span>
-                    <span>Dataset</span>
-                  </a >
-                </span>
-
-                  <span class="link-block">
-                    <a href="https://mega.nz/folder/DZlDhJBZ#dsp8_HLLkpL4c3FD74o5sg" target="_blank"
-                    class="external-link button is-normal is-rounded is-dark">
-                    <span class="icon">
-                      <i class="fas fa-robots"></i>
-                    </span>
-                    <span>Model</span>
-                  </a >
-                </span>
-
-            </div>
+          <!-- Buttons -->
+          <div class="buttons is-centered" style="gap:0.6rem; flex-wrap:wrap;">
+            <a href="https://openreview.net/forum?id=7b1MpD6IF8" target="_blank"
+               class="button is-normal is-rounded" style="background:#1e2d45; color:#fff; border:1px solid #3a4d65;">
+              <span class="icon"><i class="fas fa-link"></i></span><span>OpenReview</span>
+            </a>
+            <a href="https://arxiv.org/abs/2603.07394" target="_blank"
+               class="button is-normal is-rounded" style="background:#b31b1b; color:#fff;">
+              <span class="icon"><i class="ai ai-arxiv"></i></span><span>arXiv</span>
+            </a>
+            <!-- <a href="" target="_blank"
+               class="button is-normal is-rounded" style="background:#24292e; color:#fff;">
+              <span class="icon"><i class="fab fa-github"></i></span><span>Code</span>
+            </a> -->
+            <a href="https://huggingface.co/datasets/jihyoung/AQuA" target="_blank"
+               class="button is-normal is-rounded" style="background:#FFD21E; color:#000;">
+              <span class="icon">🤗</span><span>Dataset</span>
+            </a>
+            <a href="https://huggingface.co/jihyoung/AQuA-Qwen" target="_blank"
+               class="button is-normal is-rounded" style="background:#FFD21E; color:#000;">
+              <span class="icon">🤗</span><span>AQuA-Qwen</span>
+            </a>
+            <a href="https://huggingface.co/jihyoung/AQuA-InternVL" target="_blank"
+               class="button is-normal is-rounded" style="background:#FFD21E; color:#000;">
+              <span class="icon">🤗</span><span>AQuA-InternVL</span>
+            </a>
           </div>
         </div>
       </div>
@@ -112,24 +479,7 @@
 </section>
 
 
-
-
-<style>
-  .caption {
-    font-size: 16px;
-    color: #333;
-  }
-  .hero.teaser {
-    margin-bottom: 4rem; /* Increase spacing between video sections */
-  }
-</style>
-</head>
-</html>
-
-
-<!-- End teaser video -->
-
-<!-- Paper abstract -->
+<!-- ═══════════════════════════ ABSTRACT ═══════════════════════════ -->
 <section class="section hero is-light">
   <div class="container is-max-desktop">
     <div class="columns is-centered has-text-centered">
@@ -137,47 +487,306 @@
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
           <p>
-            Visual Question Answering (VQA) is a core task for evaluating the capabilities of Vision–Language Models (VLMs). Existing VQA benchmarks primarily feature clear and unambiguous image–question pairs, whereas real-world scenarios often involve varying degrees of ambiguity that require nuanced reasoning and context-appropriate response strategies. Although recent studies have begun to address ambiguity in VQA, they lack (1) a systematic categorization of ambiguity levels and (2) datasets and models that support strategy-aware responses. In this paper, we introduce Ambiguous Visual Question Answering (AQuA), a fine-grained dataset that classifies ambiguous VQA instances into four levels according to the nature and degree of ambiguity, along with the optimal response strategy for each case. Our evaluation of diverse open-source and proprietary VLMs shows that most models fail to adapt their strategy to the ambiguity type, frequently producing overconfident answers rather than seeking clarification or acknowledging uncertainty. To address this challenge, we fine-tune VLMs on AQuA, enabling them to adaptively choose among multiple response strategies, such as directly answering, inferring intent from contextual cues, listing plausible alternatives, or requesting clarification. VLMs trained on AQuA achieve strategic response generation for ambiguous VQA, demonstrating the ability to recognize ambiguity, manage uncertainty, and respond with context-appropriate strategies, while outperforming both open-source and closed-source baselines.
+            Visual Question Answering (VQA) is a core task for evaluating the capabilities of Vision-Language Models (VLMs). Existing VQA benchmarks primarily feature clear and unambiguous image-question pairs, whereas real-world scenarios often involve varying degrees of ambiguity that require nuanced reasoning and context-appropriate response strategies. Although recent studies have begun to address ambiguity in VQA, they lack (1) a systematic categorization of ambiguity levels and (2) datasets and models that support strategy-aware responses.
+            In this paper, we introduce <strong>Ambiguous Visual Question Answering (AQuA)</strong>, a fine-grained dataset that classifies ambiguous VQA instances into four levels according to the nature and degree of ambiguity, along with the optimal response strategy for each case. Our evaluation of diverse open-source and proprietary VLMs shows that most models fail to adapt their strategy to the ambiguity type, frequently producing overconfident answers rather than seeking clarification or acknowledging uncertainty.
+            To address this challenge, we fine-tune VLMs on AQuA, enabling them to adaptively choose among multiple response strategies, such as directly answering, inferring intent from contextual cues, listing plausible alternatives, or requesting clarification. VLMs trained on AQuA achieve strategic response generation for ambiguous VQA, demonstrating the ability to recognize ambiguity, manage uncertainty, and respond with context-appropriate strategies, while outperforming both open-source and closed-source baselines.
           </p>
         </div>
       </div>
     </div>
   </div>
 </section>
-<!-- End paper abstract -->
 
 
-<!-- New image section -->
-<section class="hero image-section">
+<!-- ═══════════════════════════ MOTIVATION ═══════════════════════════ -->
+<section class="section">
   <div class="container is-max-desktop">
-    <div class="hero-body">
-      <img src="static/images/dataset.png" alt="Description of image" style="width: 100%; height: auto;">
-      <h2 class="subtitle has-text-centered" style="font-size: 16px;">
-        Examples of the four ambiguity levels in AQUA.
-      </h2>
+    <h2 class="section-title has-text-centered">Why Does This <span>Matter</span>?</h2>
+    <div class="motivation-box">
+      <p class="motivation-quote">
+        "What color is this bat?" : asked in front of an image with many baseball bats, none visually salient.
+      </p>
+      <p style="color:#444; line-height:1.7;">
+        In real-world conversations, humans don't always give a single definitive answer when faced with ambiguous questions. Humans <strong>infer</strong> when context provides enough clues, <strong>enumerate</strong> alternatives when there are only a few plausible options, or <strong>ask for clarification</strong> when the scene is genuinely unclear. Current VLMs, however, default to confidently picking one answer, even when that confidence is not warranted.
+      </p>
+    </div>
+
+    <!-- Bat image -->
+    <div style="margin-top:1.8rem; text-align:center;">
+      <img src="static/images/bats.jpg" style="width:30%; max-width:720px; border-radius:12px; box-shadow:0 4px 24px rgba(0,0,0,0.10);">
+      <p style="font-size:0.82rem; color:#888; margin-top:0.6rem;">In this image, none of the bats is visually salient, making the visual context ambiguous.</p>
+    </div>
+
+    <!-- Response comparison -->
+    <div class="response-grid" style="margin-top:1.5rem;">
+      <div class="response-card good">
+        <div class="response-label good">✅ Our Model</div>
+        <p>"There are several baseball bats visible, so "this" could refer to more than one bat. Could you specify which bat you mean perhaps by ......"</p>
+        <p style="font-size:0.82rem; color:#16a34a; margin-top:0.5rem;">Recognizes the ambiguity and asks for clarification.</p>
+      </div>
+      <div class="response-card bad">
+        <div class="response-label bad">⚠️ GPT / Gemini / Qwen (Zero-shot)</div>
+        <p>"The bat in the foreground (leaning against the wall, farthest to the right) is black with a red handle."</p>
+        <p>"Based on the image, the bats in the foreground are a variety of colors, including natural wood, ......"</p>
+        <p>"The bat in the image is red and black."</p>
+        <p style="font-size:0.82rem; color:#888; margin-top:0.5rem;">Arbitrarily selects one bat — ignores ambiguity entirely.</p>
+      </div>
     </div>
   </div>
-</section>
-<!-- End new image section -->
 
-<!-- Section -->
-<section class="section hero is-light">
+  <p style="font-size:0.82rem; color:#888; margin-top:0.8rem; text-align:center;">
+    While GPT, Gemini, and Qwen provide answers by arbitrarily selecting (e.g., the bat in the foreground) despite the ambiguity,<br>
+    our model, which is trained to handle such cases strategically, requests clarification instead.
+  </p>
+
+</section>
+
+
+<!-- ═══════════════════════════ DATASET ═══════════════════════════ -->
+<section class="section has-light-bg">
   <div class="container is-max-desktop">
-    <div class="columns is-centered has-text-centered">
-      <div class="column is-four-fifths">
-        <h2 class="title is-3">Coming Soon!</h2>
+    <h2 class="section-title has-text-centered"><span>AQuA</span> Dataset</h2>
+    <p class="has-text-centered" style="color:#555; margin-bottom:0.5rem; max-width:680px; margin-left:auto; margin-right:auto;">
+      AQuA systematically categorizes ambiguous VQA into four fine-grained levels, each aligned with a distinct response strategy.
+    </p>
+
+    <!-- Stats -->
+    <div class="stats-row" style="justify-content:center;">
+      <div class="stat-card">
+        <div class="stat-number">7.2K</div>
+        <div class="stat-label">Total Samples</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">4</div>
+        <div class="stat-label">Ambiguity Levels</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">3.6K</div>
+        <div class="stat-label">Training Split</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">3.6K</div>
+        <div class="stat-label">Evaluation Split</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">900</div>
+        <div class="stat-label">Samples / Level</div>
+      </div>
+    </div>
+
+    <!-- Level cards -->
+    <div class="level-grid" style="margin-top:2rem;">
+      <div class="level-card l0">
+        <span class="level-badge">Level 0</span>
+        <div class="level-title">Unambiguous Questions</div>
+        <div class="level-strategy" style="color:var(--level0);">Strategy → Answer directly</div>
+        <p style="font-size:0.88rem; color:#555;">Clear, standard VQA cases with a unique, unambiguous answer. The target object is explicitly specified without vague referential terms.</p>
+        <img src="static/images/level0.jpg">
+        <div class="level-example">Q: "What food is on the baking tray?"<br>A: "A pizza is on the baking tray."</div>
+      </div>
+
+      <div class="level-card l1">
+        <span class="level-badge">Level 1</span>
+        <div class="level-title">Low-Level Referential Ambiguity</div>
+        <div class="level-strategy" style="color:var(--level1);">Strategy → Infer from context, then answer</div>
+        <p style="font-size:0.88rem; color:#555;">Questions use pronouns like "this" or "it," but a single salient object makes the referent obvious. The model should resolve and answer from context .</p>
+        <img src="static/images/level1.jpg">
+        <div class="level-example">Q: "What toppings are on this?"<br>A: "The term "this" points to the main item, the hot dog in the bun, and it's topped with mustard and ketchup."</div>
+      </div>
+
+      <div class="level-card l2">
+        <span class="level-badge">Level 2</span>
+        <div class="level-title">Multiple Valid Interpretations</div>
+        <div class="level-strategy" style="color:var(--level2);">Strategy → Enumerate all plausible answers</div>
+        <p style="font-size:0.88rem; color:#555;">2–3 plausible referents exist. Rather than guessing, the model should describe each possibility, making enumeration more efficient than clarification.</p>
+        <img src="static/images/level2.jpg">
+        <div class="level-example">Q: "What is this player doing right now?"<br>A: "The reference might be to the Mariners fielder in white at first, ......, or to the runner in gray with a blue helmet and number 49, ......"</div>
+      </div>
+
+      <div class="level-card l3">
+        <span class="level-badge">Level 3</span>
+        <div class="level-title">High-Level Ambiguity</div>
+        <div class="level-strategy" style="color:var(--level3);">Strategy → Request clarification</div>
+        <p style="font-size:0.88rem; color:#555;">Many equally plausible referents exist and enumeration would be impractical. The model must politely ask for clarification and explain why.</p>
+        <img src="static/images/level3.jpg">
+        <div class="level-example">Q: "What shape is this furniture?"<br>A: "Could you clarify which furniture you mean? There is a lot of furniture visible in the room visible in the room, so I can't tell which one's shape ......"</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════ MODEL TRAINING ═══════════════════════════ -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="section-title has-text-centered">Model <span>Training</span></h2>
+    <p class="has-text-centered" style="color:#555; margin-bottom:1.5rem; max-width:680px; margin-left:auto; margin-right:auto;">
+      We fine-tune <strong>Qwen2.5-VL-3B-Instruct</strong> and <strong>InternVL3-2B-Instruct</strong> on AQuA using a two-stage pipeline.
+    </p>
+
+    <div class="pipeline">
+      <div class="pipeline-step" style="border-top: 3px solid var(--aqua-blue);">
+        <div class="step-icon">📦</div>
+        <div class="step-name">AQuA Dataset</div>
+        <div class="step-desc">3.6K training samples<br>4 ambiguity levels</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step" style="border-top: 3px solid var(--level1);">
+        <div class="step-icon">🎓</div>
+        <div class="step-name">Stage 1: SFT</div>
+        <div class="step-desc">Supervised Fine-Tuning<br>learns strategy space</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step" style="border-top: 3px solid var(--level2);">
+        <div class="step-icon">🎯</div>
+        <div class="step-name">Stage 2: GRPO</div>
+        <div class="step-desc">Optimizes strategy choice<br>with reinforcement learning</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step" style="border-top: 3px solid var(--level3);">
+        <div class="step-icon">✨</div>
+        <div class="step-name">AQuA-Tuned</div>
+        <div class="step-desc">Ambiguity-aware<br>strategic responses</div>
+      </div>
+    </div>
+
+    <div class="motivation-box" style="margin-top:1.5rem; border-left-color: var(--level2);">
+      <p style="color:#444; line-height:1.7;">
+        <strong>Why two stages?</strong> SFT alone does not reliably select the right strategy under different levels of ambiguity.  GRPO provides explicit rewards for strategy-aware outputs, improving contextually appropriate decision-making.
+      </p>
+    </div>
+
+    <!-- Training figure placeholder -->
+    <br>
+    <img src="static/images/model.png">
+
+    <p style="font-size:0.82rem; color:#888; margin-top:0.8rem; text-align:center;">
+      Reward assignment process in GPRO.
+    </p>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════ RESULTS ═══════════════════════════ -->
+<section class="section has-light-bg">
+  <div class="container is-max-desktop">
+    <h2 class="section-title has-text-centered">Experimental <span>Results</span></h2>
+    <p class="has-text-centered" style="color:#555; margin-bottom:0.5rem; max-width:700px; margin-left:auto; margin-right:auto;">
+      Strategic Accuracy (%) on AQuA test split. Models fine-tuned on AQuA substantially outperform all baselines, including GPT-5 and Gemini 2.5 Flash.
+    </p>
+
+    <table class="results-table">
+      <thead>
+        <tr>
+          <th>Model</th>
+          <th>Level 0</th>
+          <th>Level 1</th>
+          <th>Level 2</th>
+          <th>Level 3</th>
+          <th>Overall</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="group-zeroshot"><td colspan="6">Zero-Shot</td></tr>
+        <tr class="row-zeroshot"><td>Qwen2.5-VL-3B-Instruct</td><td>97.11</td><td>0.11</td><td>33.33</td><td>0.78</td><td>32.83</td></tr>
+        <tr class="row-zeroshot"><td>Qwen2.5-VL-72B-Instruct</td><td>99.56</td><td>0.56</td><td>2.11</td><td>0.89</td><td>25.78</td></tr>
+        <tr class="row-zeroshot"><td>InternVL3-2B-Instruct</td><td>96.0</td><td>2.33</td><td>3.56</td><td>1.89</td><td>25.95</td></tr>
+        <tr class="row-zeroshot"><td>InternVL3-78B-Instruct</td><td>96.0</td><td>2.11</td><td>3.0</td><td>5.67</td><td>26.7</td></tr>
+        <tr class="row-zeroshot"><td>GPT-5</td><td>89.67</td><td>0.67</td><td>0.33</td><td>0.78</td><td>22.86</td></tr>
+        <tr class="row-zeroshot"><td>Gemini 2.5 Flash</td><td>99.00</td><td>5.22</td><td>4.44</td><td>0.89</td><td>27.39</td></tr>
+        <tr class="group-prompting"><td colspan="6">Strategy Prompting</td></tr>
+        <tr class="row-prompting"><td>Qwen2.5-VL-72B-Instruct</td><td>99.78</td><td>5.89</td><td>17.11</td><td>46.11</td><td>42.22</td></tr>
+        <tr class="row-prompting"><td>GPT-5</td><td>94.56</td><td>59.0</td><td>10.67</td><td>4.78</td><td>42.25</td></tr>
+        <tr class="row-prompting"><td>Gemini 2.5 Flash</td><td>99.11</td><td>8.0</td><td>10.68</td><td>30.11</td><td>36.98</td></tr>
+        <tr class="group-tuned"><td colspan="6">AQuA Tuned Models</td></tr>
+        <tr class="row-tuned"><td>Qwen2.5-VL-3B-Tuned</td><td class="best">99.56</td><td class="best">77.0</td><td class="best">82.22</td><td class="best">86.33</td><td class="best">86.28</td></tr>
+        <tr class="row-tuned"><td>InternVL3-2B-Tuned</td><td>98.78</td><td>80.0</td><td>59.67</td><td>78.0</td><td>79.11</td></tr>
+      </tbody>
+    </table>
+
+    <p style="font-size:0.82rem; color:#888; margin-top:0.8rem; text-align:center;">
+      Our models outperform GPT-5 and Gemini 2.5 Flash on overall strategic accuracy.
+    </p>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════ EXAMPLES ═══════════════════════════ -->
+<section class="section example-section">
+  <div class="container is-max-desktop">
+    <h2 class="section-title has-text-centered">Qualitative <span>Examples</span></h2>
+    <p class="has-text-centered" style="color:#555; margin-bottom:1.5rem; max-width:680px; margin-left:auto; margin-right:auto;">
+      Comparison between zero-shot baseline and our AQuA-tuned model across different ambiguity levels.
+    </p>
+
+    <!-- Example 1 -->
+    <div class="example-card">
+      <div class="example-header">
+        <span class="tag is-level3" style="margin-right:0.5rem;">Level 3</span>
+        Q: "What color is this round cake on the cooling rack?"
+      </div>
+      <div class="example-body">
+        <img src="static/images/ex1.jpg">
+        <div class="example-response">
+          <div class="example-response-label zs">❌ Zero-shot</div>
+          <div class="example-response-text">The round cake on the cooling rack is pink.</div>
+        </div>
+        <div class="example-response">
+          <div class="example-response-label ours">✅ AQuA-Tuned</div>
+          <div class="example-response-text">There are multiple round cakes on the cooling rack, ...... Could you specify which cake you mean ......</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Example 2 -->
+    <div class="example-card">
+      <div class="example-header">
+        <span class="tag is-level2" style="margin-right:0.5rem;">Level 2</span>
+        Q: "How many of these are on the plate?"
+      </div>
+      <div class="example-body">
+        <img src="static/images/ex2.jpg">
+        <div class="example-response">
+          <div class="example-response-label zs">❌ Zero-shot</div>
+          <div class="example-response-text">There are three items on the plate: two doughnuts and three strawberries</div>
+        </div>
+        <div class="example-response">
+          <div class="example-response-label ours">✅ AQuA-Tuned</div>
+          <div class="example-response-text">It could mean the two ring-shaped pastries with red fruit filling ...... or the three bright red strawberries ......</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Example 3 -->
+    <div class="example-card">
+      <div class="example-header">
+        <span class="tag is-level3" style="margin-right:0.5rem;">Level 3</span>
+        Q: "What color is this helmet?"
+      </div>
+      <div class="example-body">
+        <img src="static/images/ex3.jpg">
+        <div class="example-response">
+          <div class="example-response-label zs">❌ Zero-shot</div>
+          <div class="example-response-text">I am not sure what color the helmet is. It can be seen yellow, green, or black.</div>
+        </div>
+        <div class="example-response">
+          <div class="example-response-label ours">✅ AQuA-Tuned</div>
+          <div class="example-response-text">There are many helmets visible on different people ...... Could you specify which helmet you mean perhaps by the person's position ......</div>
+        </div>
       </div>
     </div>
   </div>
 </section>
-<!-- End Section -->
 
-<!-- BibTex citation -->
+
+<!-- ═══════════════════════════ BIBTEX ═══════════════════════════ -->
 <section class="section" id="BibTeX">
   <div class="container is-max-desktop content">
-    <h2 class="title">BibTeX</h2>
-    <pre><code>@inproceedings{
-  jang2026aqua,
+    <h2 class="title is-3">BibTeX</h2>
+    <pre style="background:#f8f9fc; border-radius:12px; padding:1.5rem; font-size:0.88rem; border:1px solid #e2e8f0;"><code>@inproceedings{jang2026aqua,
   title={{AQ}uA: Toward Strategic Response Generation for Ambiguous Visual Questions},
   author={Jihyoung Jang and Hyounghun Kim},
   booktitle={The Fourteenth International Conference on Learning Representations},
@@ -186,13 +795,17 @@
 }</code></pre>
   </div>
 </section>
-<!-- End BibTex citation -->
+
+
+<!-- ═══════════════════════════ FOOTER ═══════════════════════════ -->
+<footer class="footer">
+  <div class="content has-text-centered" style="padding: 2rem 1rem;">
+    <p style="color:#8892b0;">
+      This website is based on the
+      <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a>.
+    </p>
+  </div>
+</footer>
 
 </body>
 </html>
-
-
-
-
-
-
